@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ARSoft.Tools.Net;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -32,7 +33,7 @@ namespace mFamousDomain
                     Console.WriteLine(e);
                 }
             }));
-            
+
             tasks.Add(Task.Run(() =>
             {
                 try
@@ -49,7 +50,7 @@ namespace mFamousDomain
                     Console.WriteLine(e);
                 }
             }));
-            
+
             tasks.Add(Task.Run(() =>
             {
                 try
@@ -84,7 +85,7 @@ namespace mFamousDomain
 
                     var list = texts.Skip(1).Select(item => item.Replace("\"", string.Empty).Split(',').ToList())
                         .Select(i => string.Join(',', i[0], i[1])).ToList();
-                    
+
                     GC.Collect();
                     File.WriteAllLines("./result/domcop.top-1m.csv", list);
                     File.Delete("./temp/domcop.top10milliondomains.csv");
@@ -152,6 +153,45 @@ namespace mFamousDomain
             {
                 Console.WriteLine(e);
             }
+
+            GC.Collect();
+
+            var resultList = new List<string>();
+            foreach (var item in Directory.GetFiles("./result"))
+            {
+                resultList.AddRange(File.ReadAllLines(item).ToList().Select(
+                    s => s.Split(',').LastOrDefault()).ToList());
+                resultList = resultList.Distinct().ToList();
+            }
+            File.WriteAllLines("./original.txt", resultList);
+            GC.Collect();
+            
+            resultList = resultList.SkipLast(resultList.Count - 1000000).ToList();
+            File.WriteAllLines("./original-1m.txt", resultList);
+            GC.Collect();
+
+            resultList = resultList.SkipLast(resultList.Count - 100000).ToList();
+            File.WriteAllLines("./original-100k.txt", resultList);
+            GC.Collect();
+
+            var resultList2 = new List<string>();
+            //Parallel.ForEach(resultList, item =>
+            foreach (var item in resultList)
+            {
+                var domainName = DomainName.Parse(item);
+                var name = DomainName.Parse(item);
+                for (var i = 0; i < domainName.LabelCount - 1; i++)
+                {
+                    name = name.GetParentName();
+                    if (!resultList.Contains(name.ToString().TrimEnd('.')))
+                        resultList2.Add(domainName.ToString().TrimEnd('.'));
+                    else
+                        Console.WriteLine(domainName);
+                }
+            }
+
+            File.WriteAllLines("./result-100k.txt", resultList2);
+            File.WriteAllLines("./result-10k.txt", resultList2.SkipLast(resultList.Count - 10000).ToList());
         }
     }
 }
