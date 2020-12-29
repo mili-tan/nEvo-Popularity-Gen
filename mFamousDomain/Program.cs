@@ -170,7 +170,7 @@ namespace mFamousDomain
             File.WriteAllLines("./original-1m.txt", resultList);
             GC.Collect();
 
-            resultList = resultList.SkipLast(resultList.Count - 100000).ToList();
+            resultList = resultList.SkipLast(resultList.Count - 101000).ToList();
             File.WriteAllLines("./original-100k.txt", resultList);
             GC.Collect();
 
@@ -190,8 +190,9 @@ namespace mFamousDomain
                 }
             }
 
-            File.WriteAllLines("./result-100k.txt", resultList2);
-            File.WriteAllLines("./result-10k.txt", resultList2.SkipLast(resultList.Count - 10000).ToList());
+            resultList2 = resultList2.Distinct().ToList();
+            File.WriteAllLines("./result-100k.txt", resultList2.SkipLast(resultList2.Count - 100000).ToList());
+            File.WriteAllLines("./result-10k.txt", resultList2.SkipLast(resultList2.Count - 10000).ToList());
         }
     }
 }
