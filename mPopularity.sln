@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mFamousDomain", "mFamousDomain\mFamousDomain.csproj", "{9128E0ED-0DBB-4317-9560-703C84343B65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mPopularity", "mPopularity\mPopularity.csproj", "{9128E0ED-0DBB-4317-9560-703C84343B65}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
