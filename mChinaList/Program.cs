@@ -17,22 +17,22 @@ namespace mChnList
         {
             if (!File.Exists("GeoLite2-Country.mmdb"))
                 new WebClient().DownloadFile(
-                    "https://github.com/mili-tan/maxmind-geoip/releases/latest/download/GeoLite2-Country.mmdb",
+                    "https://ghproxy.com/github.com/mili-tan/maxmind-geoip/releases/latest/download/GeoLite2-Country.mmdb",
                     "GeoLite2-Country.mmdb");
-            if (!File.Exists("result-10k.csv"))
+            if (!File.Exists("result-100k.csv"))
                 new WebClient().DownloadFile(
-                    "https://raw.githubusercontent.com/NovaXNS/popularity/master/result/result-10k.csv",
-                    "result-10k.csv");
+                    "https://ghproxy.com/raw.githubusercontent.com/NovaXNS/popularity/master/result/result-100k.csv",
+                    "result-100k.csv");
 
             var countryReader = new DatabaseReader("GeoLite2-Country.mmdb");
-            var lines = File.ReadAllLines("result-10k.csv");
+            var lines = File.ReadAllLines("result-100k.csv");
             var list = new List<string>();
             var dnsList = new List<IPAddress>()
             {
-                IPAddress.Parse("8.8.8.8"), IPAddress.Parse("8.8.4.4"), IPAddress.Parse("1.0.0.1"),
-                IPAddress.Parse("208.67.222.222"), IPAddress.Parse("185.121.177.177"), IPAddress.Parse("9.9.9.9"),
-                IPAddress.Parse("119.29.29.29"), IPAddress.Parse("223.5.5.5"), IPAddress.Parse("180.76.76.76"),
-                IPAddress.Parse("185.222.222.222"), IPAddress.Parse("114.114.114.114"), IPAddress.Parse("117.50.10.10")
+                IPAddress.Parse("114.114.114.114"), IPAddress.Parse("223.6.6.6"), IPAddress.Parse("180.76.76.76"),
+                IPAddress.Parse("119.29.29.29"), IPAddress.Parse("1.2.4.8"), IPAddress.Parse("117.50.10.10"),
+                IPAddress.Parse("52.80.52.52"), IPAddress.Parse("101.226.4.6"), IPAddress.Parse("218.30.118.6"),
+                IPAddress.Parse("114.114.115.115"), IPAddress.Parse("223.5.5.5"), IPAddress.Parse("119.28.28.28")
             };
             Parallel.ForEach(lines, item =>
             {
