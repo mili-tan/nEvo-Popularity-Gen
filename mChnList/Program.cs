@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using ARSoft.Tools.Net;
 using ARSoft.Tools.Net.Dns;
@@ -30,9 +31,27 @@ namespace mChnList
             {
                 try
                 {
-                    var rRecord = new DnsClient(IPAddress.Parse("8.8.8.8"), 1000)
-                        .Resolve(DomainName.Parse(item.Split(',')[1]))
-                        .AnswerRecords.FirstOrDefault() as ARecord;
+                    ARecord rRecord = null;
+                    int count = 0;
+                    while (rRecord == null)
+                    {
+                        try
+                        {
+                            rRecord = new DnsClient(IPAddress.Parse("119.29.29.29"), 1500)
+                                .Resolve(DomainName.Parse(item.Split(',')[1]))
+                                .AnswerRecords.FirstOrDefault() as ARecord;
+                        }
+                        catch (Exception)
+                        {
+                            count += 1;
+                            Console.WriteLine($"ERR:{count}:{item}");
+                            rRecord = null;
+                            Thread.Sleep(1000);
+                            if (count >= 6) break;
+                        }
+                    }
+
+                    if (rRecord == null) return;
                     var country = countryReader.Country(rRecord.Address).Country;
                     Console.WriteLine(item + "," + country.IsoCode);
                     if (country.IsoCode == "CN") list.Add(item);
