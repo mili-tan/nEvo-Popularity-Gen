@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mPopularity", "mPopularity\mPopularity.csproj", "{9128E0ED-0DBB-4317-9560-703C84343B65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mChnList", "mChnList\mChnList.csproj", "{D80978C4-6333-446C-99F3-76CD1C5CAAB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mChinaList", "mChinaList\mChinaList.csproj", "{D80978C4-6333-446C-99F3-76CD1C5CAAB6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
