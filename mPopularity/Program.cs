@@ -164,8 +164,7 @@ namespace mFamousDomain
             foreach (var item in Directory.GetFiles("./source"))
             {
                 foreach (var iStr in File.ReadAllLines(item).ToList().Select(i => i.Split(',')))
-                    resultDict.TryAdd(iStr[1], Convert.ToInt32(iStr[0]));
-                GC.Collect();
+                    if (!resultDict.ContainsKey(iStr[1])) resultDict.Add(iStr[1], Convert.ToInt32(iStr[0]));
             }
 
             GC.Collect();
@@ -189,7 +188,8 @@ namespace mFamousDomain
                 }
 
                 // ReSharper disable once AccessToModifiedClosure
-                if (b) resultDict2.TryAdd(domainName.ToString().TrimEnd('.'), item.Value);
+                var nameStr = domainName.ToString().TrimEnd('.');
+                if (b && !resultDict2.ContainsKey(nameStr)) resultDict2.TryAdd(nameStr, item.Value);
             });
 
             GC.Collect();
