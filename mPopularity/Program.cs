@@ -6,6 +6,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+// ReSharper disable AccessToModifiedClosure
 
 namespace mFamousDomain
 {
@@ -187,7 +188,6 @@ namespace mFamousDomain
                     if (resultOrderBy.Keys.Contains(name.ToString().TrimEnd('.'))) b = false;
                 }
 
-                // ReSharper disable once AccessToModifiedClosure
                 var nameStr = domainName.ToString().TrimEnd('.');
                 if (b && !resultDict2.ContainsKey(nameStr)) resultDict2.TryAdd(nameStr, item.Value);
             });
