@@ -1,5 +1,6 @@
 ﻿using ARSoft.Tools.Net;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -122,26 +123,26 @@ namespace mFamousDomain
                 }
             }));
 
-            tasks.Add(Task.Run(() =>
-            {
-                try
-                {
-                    Console.WriteLine("moz...");
-                    new WebClient().DownloadFile("https://moz.com/top-500/download/?table=top500Domains", "./temp/moz.csv");
-                    var texts = File.ReadLines("./temp/moz.csv").ToList().Skip(1);
-                    var list = texts.Select(item => item.Replace("\"", string.Empty).Split(',').ToList())
-                        .Select(i => string.Join(',', i[0], i[1])).ToList();
+            //tasks.Add(Task.Run(() =>
+            //{
+            //    try
+            //    {
+            //        Console.WriteLine("moz...");
+            //        new WebClient().DownloadFile("https://moz.com/top-500/download/?table=top500Domains", "./temp/moz.csv");
+            //        var texts = File.ReadLines("./temp/moz.csv").ToList().Skip(1);
+            //        var list = texts.Select(item => item.Replace("\"", string.Empty).Split(',').ToList())
+            //            .Select(i => string.Join(',', i[0], i[1])).ToList();
 
-                    File.WriteAllLines("./source/moz.top-500.csv", list);
-                    File.Delete("./temp/moz.csv");
-                    Console.WriteLine("moz ok");
-                    GC.Collect();
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }));
+            //        File.WriteAllLines("./source/moz.top-500.csv", list);
+            //        File.Delete("./temp/moz.csv");
+            //        Console.WriteLine("moz ok");
+            //        GC.Collect();
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        Console.WriteLine(e);
+            //    }
+            //}));
 
             Task.WaitAll(tasks.ToArray());
 
@@ -161,11 +162,11 @@ namespace mFamousDomain
             GC.Collect();
             Console.WriteLine("DL DONE!");
 
-            var resultDict = new Dictionary<string, int>();
+            var resultDict = new ConcurrentDictionary<string, int>();
             foreach (var item in Directory.GetFiles("./source"))
             {
                 foreach (var iStr in File.ReadAllLines(item).ToList().Select(i => i.Split(',')))
-                    if (!resultDict.ContainsKey(iStr[1])) resultDict.Add(iStr[1], Convert.ToInt32(iStr[0]));
+                    if (!resultDict.ContainsKey(iStr[1])) resultDict.TryAdd(iStr[1], Convert.ToInt32(iStr[0]));
             }
 
             GC.Collect();
@@ -176,7 +177,7 @@ namespace mFamousDomain
             GC.Collect();
             Console.WriteLine("Select DONE!");
 
-            var resultDict2 = new Dictionary<string, int>();
+            var resultDict2 = new ConcurrentDictionary<string, int>();
             Parallel.ForEach(resultOrderBy, item =>
             {
                 var domainName = DomainName.Parse(item.Key);
@@ -194,8 +195,8 @@ namespace mFamousDomain
 
             GC.Collect();
             Console.WriteLine("Result DONE!");
-            resultDict2 = resultDict2.OrderBy(o => o.Value).ToDictionary(o => o.Key, p => p.Value);
-            var resultList2 = resultDict2.Select(item => $"{item.Value},{item.Key}").ToList();
+            var resultDict3 = resultDict2.OrderBy(o => o.Value).ToDictionary(o => o.Key, p => p.Value);
+            var resultList2 = resultDict3.Select(item => $"{item.Value},{item.Key}").ToList();
             File.WriteAllLines("./result/result.csv", resultList2);
             File.WriteAllLines("./result/result-1m.csv", resultList2.SkipLast(resultList2.Count - 1000000).ToList());
             File.WriteAllLines("./result/result-100k.csv", resultList2.SkipLast(resultList2.Count - 100000).ToList());
