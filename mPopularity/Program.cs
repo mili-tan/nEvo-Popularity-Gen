@@ -202,7 +202,7 @@ namespace mFamousDomain
             File.WriteAllLines("./result/result-100k.csv", resultList2.SkipLast(resultList2.Count - 100000).ToList());
             File.WriteAllLines("./result/result-10k.csv", resultList2.SkipLast(resultList2.Count - 10000).ToList());
             File.WriteAllLines("./result/result-10k.txt",
-                resultDict2.SkipLast(resultDict2.Count - 10000).ToDictionary(o => o.Key, p => p.Value).Keys.ToList());
+                resultDict3.SkipLast(resultDict3.Count - 10000).ToDictionary(o => o.Key, p => p.Value).Keys.ToList());
         }
     }
 }
