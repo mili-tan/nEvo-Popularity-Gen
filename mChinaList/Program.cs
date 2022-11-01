@@ -82,7 +82,7 @@ namespace mChnList
                                 ip = null;
                                 Console.WriteLine($"ERR:{count}:{item}:{e.Message}");
                                 Thread.Sleep(1500);
-                                //if (count >= 3) break;
+                                if (count >= 3) break;
                             }
                         }
                     }
@@ -90,10 +90,13 @@ namespace mChnList
                     if (ip == null) return;
                     var country = new DatabaseReader("GeoLite2-Country.mmdb").Country(ip).Country;
                     var asn = new DatabaseReader("GeoLite2-ASN.mmdb").Asn(ip);
-                    Console.WriteLine(string.Join(",", ip.ToString(), country.IsoCode,
+                    Console.WriteLine(string.Join(",", item,ip.ToString(), country.IsoCode,
                         asn.AutonomousSystemNumber.ToString(), asn.AutonomousSystemOrganization));
-                    list.Add(string.Join(",", ip.ToString(), country.IsoCode, asn.AutonomousSystemNumber.ToString(),
+                    list.Add(string.Join(",", item, ip.ToString(), country.IsoCode,
+                        asn.AutonomousSystemNumber.ToString(),
                         asn.AutonomousSystemOrganization));
+
+                    File.WriteAllLines("cnlist.csv", list);
                 }
                 catch (Exception e)
                 {
