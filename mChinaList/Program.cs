@@ -96,7 +96,7 @@ namespace mChnList
                         asn.AutonomousSystemNumber.ToString(),
                         asn.AutonomousSystemOrganization));
 
-                    File.WriteAllLines("cnlist.csv", list);
+                    //File.WriteAllLines("cnlist.csv", list);
                 }
                 catch (Exception e)
                 {
