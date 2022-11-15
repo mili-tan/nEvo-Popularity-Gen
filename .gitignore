@@ -342,3 +342,7 @@ healthchecksdb
 /mChinaList/GeoLite2-Country.mmdb
 /mChinaList/GeoLite2-ASN.mmdb
 /mChinaList/cnlist.csv
+/mInfo/GeoLite2-Country.mmdb
+/mInfo/GeoLite2-ASN.mmdb
+/mInfo/cnlist.csv
+/mInfo/result-10k.csv
