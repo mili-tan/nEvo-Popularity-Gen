@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mPopularity", "mPopularity\mPopularity.csproj", "{9128E0ED-0DBB-4317-9560-703C84343B65}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mChinaList", "mChinaList\mChinaList.csproj", "{D80978C4-6333-446C-99F3-76CD1C5CAAB6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mInfo", "mInfo\mInfo.csproj", "{D80978C4-6333-446C-99F3-76CD1C5CAAB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mChinaList", "mChinaList\mChinaList.csproj", "{AEF3C37B-C7AF-49DD-9647-0CDE3021D490}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{D80978C4-6333-446C-99F3-76CD1C5CAAB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D80978C4-6333-446C-99F3-76CD1C5CAAB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D80978C4-6333-446C-99F3-76CD1C5CAAB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEF3C37B-C7AF-49DD-9647-0CDE3021D490}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEF3C37B-C7AF-49DD-9647-0CDE3021D490}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEF3C37B-C7AF-49DD-9647-0CDE3021D490}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEF3C37B-C7AF-49DD-9647-0CDE3021D490}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

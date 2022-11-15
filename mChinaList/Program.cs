@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,9 +8,8 @@ using System.Threading.Tasks;
 using ARSoft.Tools.Net;
 using ARSoft.Tools.Net.Dns;
 using MaxMind.GeoIP2;
-using Newtonsoft.Json.Linq;
 
-namespace mChnList
+namespace mChinaList
 {
     class Program
     {
@@ -19,19 +17,16 @@ namespace mChnList
         {
             if (!File.Exists("GeoLite2-Country.mmdb"))
                 new WebClient().DownloadFile(
-                    "https://mmdb.mili.one/GeoLite2-Country.mmdb",
+                    "https://ghproxy.com/github.com/mili-tan/maxmind-geoip/releases/latest/download/GeoLite2-Country.mmdb",
                     "GeoLite2-Country.mmdb");
-            if (!File.Exists("GeoLite2-ASN.mmdb"))
+            if (!File.Exists("result-100k.csv"))
                 new WebClient().DownloadFile(
-                    "https://mmdb.mili.one/GeoLite2-ASN.mmdb",
-                    "GeoLite2-ASN.mmdb");
-            if (!File.Exists("result-10k.csv"))
-                new WebClient().DownloadFile(
-                    "https://ghproxy.com/raw.githubusercontent.com/NovaXNS/popularity/master/result/result-10k.csv",
-                    "result-10k.csv");
+                    "https://ghproxy.com/raw.githubusercontent.com/NovaXNS/popularity/master/result/result-100k.csv",
+                    "result-100k.csv");
 
-            var lines = File.ReadAllLines("result-10k.csv");
-            var list = new ConcurrentBag<string>();
+            var countryReader = new DatabaseReader("GeoLite2-Country.mmdb");
+            var lines = File.ReadAllLines("result-100k.csv");
+            var list = new List<string>();
             var dnsList = new List<IPAddress>()
             {
                 IPAddress.Parse("114.114.114.114"), IPAddress.Parse("223.6.6.6"), IPAddress.Parse("180.76.76.76"),
@@ -39,15 +34,6 @@ namespace mChnList
                 IPAddress.Parse("52.80.52.52"), IPAddress.Parse("101.226.4.6"), IPAddress.Parse("218.30.118.6"),
                 IPAddress.Parse("114.114.115.115"), IPAddress.Parse("223.5.5.5"), IPAddress.Parse("119.28.28.28")
             };
-
-            var dohList = new List<string>()
-            {
-                "https://dns.pub/dns-query?name=",
-                "https://doh.pub/dns-query?name=",
-                "https://1.12.12.12/dns-query?name=",
-                "https://120.53.53.53/dns-query?name=",
-            };
-
             Parallel.ForEach(lines, item =>
             {
                 try
@@ -59,28 +45,23 @@ namespace mChnList
                     {
                         try
                         {
-                            if (new DnsClient(dnsList[new Random(DateTime.Now.Second).Next(dnsList.Count)], 1500)
-                                    .Resolve(name).AnswerRecords.FirstOrDefault() is ARecord aRecord)
-                            {
-                                ip = aRecord.Address;
-                            }
+                            ip = (new DnsClient(dnsList[new Random(DateTime.Now.Second).Next(dnsList.Count)], 1500)
+                                .Resolve(name).AnswerRecords.FirstOrDefault() as ARecord)?.Address;
                         }
                         catch (Exception)
                         {
                             try
                             {
                                 Console.WriteLine($"HTTP:{count}:{item}");
-                                var jobj = JObject.Parse(new WebClient()
-                                    .DownloadString(dohList[new Random(DateTime.Now.Second).Next(dohList.Count)]
-                                                    + name.ToString().TrimEnd('.')));
-                                if (jobj["Status"].ToString() == "0" && jobj["Answer"].Any())
-                                    ip = IPAddress.Parse(jobj["Answer"].First["data"].ToString());
+                                ip = IPAddress.Parse(new WebClient()
+                                    .DownloadString("http://119.29.29.29/d?dn=" + name.ToString().TrimEnd('.'))
+                                    .Split(';').FirstOrDefault());
                             }
-                            catch (Exception e)
+                            catch (Exception)
                             {
                                 count += 1;
                                 ip = null;
-                                Console.WriteLine($"ERR:{count}:{item}:{e.Message}");
+                                Console.WriteLine($"ERR:{count}:{item}");
                                 Thread.Sleep(1500);
                                 if (count >= 3) break;
                             }
@@ -88,15 +69,9 @@ namespace mChnList
                     }
 
                     if (ip == null) return;
-                    var country = new DatabaseReader("GeoLite2-Country.mmdb").Country(ip).Country;
-                    var asn = new DatabaseReader("GeoLite2-ASN.mmdb").Asn(ip);
-                    Console.WriteLine(string.Join(",", item,ip.ToString(), country.IsoCode,
-                        asn.AutonomousSystemNumber.ToString(), asn.AutonomousSystemOrganization));
-                    list.Add(string.Join(",", item, ip.ToString(), country.IsoCode,
-                        asn.AutonomousSystemNumber.ToString(),
-                        asn.AutonomousSystemOrganization));
-
-                    //File.WriteAllLines("cnlist.csv", list);
+                    var country = countryReader.Country(ip).Country;
+                    Console.WriteLine(item + "," + country.IsoCode);
+                    if (country.IsoCode == "CN") list.Add(item);
                 }
                 catch (Exception e)
                 {
