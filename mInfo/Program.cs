@@ -27,7 +27,7 @@ namespace mInfo
                     "GeoLite2-ASN.mmdb");
             if (!File.Exists("result-10k.csv"))
                 new WebClient().DownloadFile(
-                    "https://ghproxy.com/raw.githubusercontent.com/NovaXNS/popularity/master/result/result-10k.csv",
+                    "https://ghproxy.com/raw.githubusercontent.com/NovaXNS/nEvo-Popularity/master/result/result-10k.csv",
                     "result-10k.csv");
 
             var lines = File.ReadAllLines("result-10k.csv");

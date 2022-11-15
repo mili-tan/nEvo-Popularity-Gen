@@ -21,7 +21,7 @@ namespace mChinaList
                     "GeoLite2-Country.mmdb");
             if (!File.Exists("result-100k.csv"))
                 new WebClient().DownloadFile(
-                    "https://ghproxy.com/raw.githubusercontent.com/NovaXNS/popularity/master/result/result-100k.csv",
+                    "https://ghproxy.com/raw.githubusercontent.com/NovaXNS/nEvo-Popularity/master/result/result-100k.csv",
                     "result-100k.csv");
 
             var countryReader = new DatabaseReader("GeoLite2-Country.mmdb");
