@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Threading;
+using System.Net.Http;
 using System.Threading.Tasks;
 using ARSoft.Tools.Net;
 using ARSoft.Tools.Net.Dns;
@@ -13,6 +13,14 @@ namespace mChinaList
 {
     class Program
     {
+        static List<IPAddress> DnsList = new()
+        {
+            IPAddress.Parse("114.114.114.114"), IPAddress.Parse("223.6.6.6"), IPAddress.Parse("180.76.76.76"),
+            IPAddress.Parse("119.29.29.29"), IPAddress.Parse("1.2.4.8"), IPAddress.Parse("117.50.10.10"),
+            IPAddress.Parse("52.80.52.52"), IPAddress.Parse("101.226.4.6"), IPAddress.Parse("218.30.118.6"),
+            IPAddress.Parse("114.114.115.115"), IPAddress.Parse("223.5.5.5"), IPAddress.Parse("119.28.28.28")
+        };
+
         static void Main(string[] args)
         {
             if (!File.Exists("GeoLite2-Country.mmdb"))
@@ -27,14 +35,8 @@ namespace mChinaList
             var countryReader = new DatabaseReader("GeoLite2-Country.mmdb");
             var lines = File.ReadAllLines("result-100k.csv");
             var list = new List<string>();
-            var dnsList = new List<IPAddress>()
-            {
-                IPAddress.Parse("114.114.114.114"), IPAddress.Parse("223.6.6.6"), IPAddress.Parse("180.76.76.76"),
-                IPAddress.Parse("119.29.29.29"), IPAddress.Parse("1.2.4.8"), IPAddress.Parse("117.50.10.10"),
-                IPAddress.Parse("52.80.52.52"), IPAddress.Parse("101.226.4.6"), IPAddress.Parse("218.30.118.6"),
-                IPAddress.Parse("114.114.115.115"), IPAddress.Parse("223.5.5.5"), IPAddress.Parse("119.28.28.28")
-            };
-            Parallel.ForEach(lines, item =>
+
+            Parallel.ForEachAsync(lines, async (item,token) =>
             {
                 try
                 {
@@ -45,40 +47,45 @@ namespace mChinaList
                     {
                         try
                         {
-                            ip = (new DnsClient(dnsList[new Random(DateTime.Now.Second).Next(dnsList.Count)], 1500)
-                                .Resolve(name).AnswerRecords.FirstOrDefault() as ARecord)?.Address;
+                            ip = ((await new DnsClient(new[]{ GetRandomDnsAddress(), GetRandomDnsAddress(), GetRandomDnsAddress() }, 1500)
+                                .ResolveAsync(name, token: token)).AnswerRecords.FirstOrDefault() as ARecord)?.Address;
                         }
                         catch (Exception)
                         {
                             try
                             {
                                 Console.WriteLine($"HTTP:{count}:{item}");
-                                ip = IPAddress.Parse(new WebClient()
-                                    .DownloadString("http://119.29.29.29/d?dn=" + name.ToString().TrimEnd('.'))
-                                    .Split(';').FirstOrDefault());
+                                ip = IPAddress.Parse((await new HttpClient()
+                                    .GetStringAsync("http://119.29.29.29/d?dn=" + name.ToString().TrimEnd('.'), token)
+                                    ).Split(';').FirstOrDefault());
                             }
                             catch (Exception)
                             {
                                 count += 1;
                                 ip = null;
                                 Console.WriteLine($"ERR:{count}:{item}");
-                                Thread.Sleep(1500);
-                                if (count >= 3) break;
+                                //await Task.Delay(500, token);
+                                if (count >= 2) break;
                             }
                         }
                     }
 
                     if (ip == null) return;
                     var country = countryReader.Country(ip).Country;
-                    Console.WriteLine(item + "," + country.IsoCode);
+                    await Task.Run(() => Console.WriteLine(item + "," + country.IsoCode), token);
                     if (country.IsoCode == "CN") list.Add(item);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
-            });
+            }).Wait();
             File.WriteAllLines("cnlist.csv", list);
+        }
+
+        public static IPAddress GetRandomDnsAddress()
+        {
+            return DnsList[new Random(DateTime.Now.Second).Next(DnsList.Count)];
         }
     }
 }
