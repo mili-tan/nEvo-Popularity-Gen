@@ -59,13 +59,13 @@ namespace mInfo
                         try
                         {
                             var res = await new DnsClient(new[] { GetRandomDnsAddress(), GetRandomDnsAddress(), GetRandomDnsAddress() }, 1500)
-                                .ResolveAsync(name, RecordType.Ns, token: token);
+                                .ResolveAsync(name, RecordType.Ns, token: token).ConfigureAwait(false);
                             if (res == null || !res.AnswerRecords.Any()) continue;
                             foreach (var i in res.AnswerRecords)
                             {
                                 if (i is not NsRecord nsRecord) continue;
                                 ns.Add(nsRecord.NameServer);
-                                await Task.Run(() => Console.WriteLine(nsRecord.NameServer), token);
+                                await Task.Run(() => Console.WriteLine(nsRecord.NameServer), token).ConfigureAwait(false);
                             }
                         }
                         catch (Exception)
@@ -73,20 +73,20 @@ namespace mInfo
                             try
                             {
                                 var res = await new DnsClient(new []{ GetRandomDnsAddress() , GetRandomDnsAddress() , GetRandomDnsAddress() }, 1500)
-                                    .ResolveAsync(name, RecordType.Ns, token:token);
+                                    .ResolveAsync(name, RecordType.Ns, token:token).ConfigureAwait(false);
                                 if (res == null || !res.AnswerRecords.Any()) continue;
                                 foreach (var i in res.AnswerRecords)
                                 {
                                     if (i is not NsRecord nsRecord) continue;
                                     ns.Add(nsRecord.NameServer);
-                                    await Task.Run(() => Console.WriteLine(nsRecord.NameServer));
+                                    await Task.Run(() => Console.WriteLine(nsRecord.NameServer), token).ConfigureAwait(false);
                                 }
                             }
                             catch (Exception e)
                             {
                                 count += 1;
                                 ns = null;
-                                Console.WriteLine($"ERR:{count}:{item}:{e.Message}");
+                                await Task.Run(()=> Console.WriteLine($"ERR:{count}:{item}:{e.Message}"), token).ConfigureAwait(false);
                                 //await Task.Delay(500, token);
                                 if (count >= 1) break;
                             }

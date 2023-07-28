@@ -48,31 +48,31 @@ namespace mChinaList
                         try
                         {
                             ip = ((await new DnsClient(new[]{ GetRandomDnsAddress(), GetRandomDnsAddress(), GetRandomDnsAddress() }, 1500)
-                                .ResolveAsync(name, token: token)).AnswerRecords.FirstOrDefault() as ARecord)?.Address;
+                                .ResolveAsync(name, token: token).ConfigureAwait(false)).AnswerRecords.FirstOrDefault() as ARecord)?.Address;
                         }
                         catch (Exception)
                         {
                             try
                             {
-                                Console.WriteLine($"HTTP:{count}:{item}");
+                                await Task.Run(()=> Console.WriteLine($"HTTP:{count}:{item}"), token).ConfigureAwait(false);
                                 ip = IPAddress.Parse((await new HttpClient()
-                                    .GetStringAsync("http://119.29.29.29/d?dn=" + name.ToString().TrimEnd('.'), token)
+                                        .GetStringAsync("http://119.29.29.29/d?dn=" + name.ToString().TrimEnd('.'), token).ConfigureAwait(false)
                                     ).Split(';').FirstOrDefault());
                             }
                             catch (Exception)
                             {
                                 count += 1;
                                 ip = null;
-                                Console.WriteLine($"ERR:{count}:{item}");
+                                await Task.Run(() => Console.WriteLine($"ERR:{count}:{item}"), token).ConfigureAwait(false);
                                 //await Task.Delay(500, token);
-                                if (count >= 2) break;
+                                if (count >= 1) break;
                             }
                         }
                     }
 
                     if (ip == null) return;
                     var country = countryReader.Country(ip).Country;
-                    await Task.Run(() => Console.WriteLine(item + "," + country.IsoCode), token);
+                    await Task.Run(() => Console.WriteLine(item + "," + country.IsoCode), token).ConfigureAwait(false);
                     if (country.IsoCode == "CN") list.Add(item);
                 }
                 catch (Exception e)
